@@ -1,5 +1,5 @@
 type Hash = Vec<u8>;
-type Address = String;
+type Address = String; // as string for readability, should become public address(hash)
 
 use std::time::{ SystemTime, UNIX_EPOCH };
 
@@ -9,8 +9,8 @@ mod hashable;
 pub use crate::hashable::Hashable;
 mod blockchain;
 pub use crate::blockchain::Blockchain;
-// pub mod transaction;
-// pub use crate::transaction::Transaction;
+pub mod transaction;
+pub use crate::transaction::Transaction;
 
 pub fn now () -> u128 {
     let duration = SystemTime::now()
