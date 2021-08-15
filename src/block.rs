@@ -12,7 +12,7 @@ pub struct Block{
 }
 
 impl Block {
-    pub fn new (index: u32, timestamp: u128, prev_block_hash: Hash, transactions: String, difficulty: u128, nonce: u64) -> Self {
+    pub fn new (index: u32, timestamp: u128, prev_block_hash: Hash, transactions: String, nonce: u64, difficulty: u128) -> Self {
         Block {
             index,
             timestamp,
@@ -23,6 +23,27 @@ impl Block {
             transactions,
         }
     }
+
+    pub fn mine (&mut self) {
+        for nonce_candidate in 0..(u64::max_value()) {
+            self.nonce = nonce_candidate;
+            let block_hash = self.hash();
+            if check_difficulty(&block_hash, self.difficulty) {
+                self.block_hash = block_hash;
+                return;
+            }
+            // TODO: handle case of unsolvable difficulty
+        }
+    }
+}
+
+// helper functions
+/*
+puts condition on the produced blockhash
+thats why difficulty has to be in byte representation
+*/
+pub fn check_difficulty (hash: &Hash, difficulty: u128) -> bool {
+    difficulty > difficulty_bytes_as_u128(&hash)
 }
 
 impl Hashable for Block {
@@ -41,7 +62,8 @@ impl Hashable for Block {
 
 impl Debug for Block {
     fn fmt(&self, format: &mut Formatter) -> fmt::Result {
-        write!(format, "Block[{}]:{} at: {} with: {} and nonce: {}",
+        write!(format, "from: {}\n -> Block[{}]:{} at: {} with: {} and nonce: {}",
+            &hex::encode(&self.prev_block_hash),
             &self.index,
             &hex::encode(&self.block_hash),
             &self.timestamp,
